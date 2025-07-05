@@ -2,19 +2,19 @@ import streamlit as st
 import json
 import random
 
-# --- 1. CONFIGURACIÓN DE LA PÁGINA (CON TU ICONO CORRECTO) ---
+# --- 1. CONFIGURACIÓN DE LA PÁGINA (CON EL ENLACE ESPECIAL) ---
 st.set_page_config(
     page_title="Examen Auxiliar de Farmacia",
-    page_icon="https://raw.githubusercontent.com/Sebasm2kuy/examenM2/main/Copilot_20250704_171338.png", # <--- ¡AQUÍ ESTÁ EL ENLACE CORRECTO!
+    page_icon="https://github.com/Sebasm2kuy/examenM2/blob/main/Copilot_20250704_171338.png?raw=true", # <--- ENLACE CORREGIDO
     layout="centered"
 )
 
-# --- 2. METADATOS PARA REDES SOCIALES (CON TU IMAGEN CORRECTA) ---
+# --- 2. METADATOS PARA REDES SOCIALES (CON EL ENLACE ESPECIAL) ---
 st.markdown(
     """
     <meta property="og:title" content="Examen Auxiliar de Farmacia">
     <meta property="og:description" content="Practica para el examen con preguntas aleatorias. ¡Cada intento es un nuevo desafío! Completamente gratis y sin límites.">
-    <meta property="og:image" content="https://raw.githubusercontent.com/Sebasm2kuy/examenM2/main/Copilot_20250704_171338.png">
+    <meta property="og:image" content="https://github.com/Sebasm2kuy/examenM2/blob/main/Copilot_20250704_171338.png?raw=true">
     <meta property="og:url" content="https://examenahhm2.streamlit.app/">
     <meta name="twitter:card" content="summary_large_image">
     """,
