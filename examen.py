@@ -63,11 +63,13 @@ if not st.session_state.examen_en_curso and not st.session_state.examen_finaliza
     - **Tiempo:** Elige un límite de tiempo. Si se acaba, el examen se entregará automáticamente.
     """)
     
-    # CAMBIO 1: Selección de tiempo
+    # ### <<< CAMBIO AQUÍ >>> ###
+    # Se añade el parámetro 'format_func' para cambiar cómo se muestran las opciones.
     time_option_minutes = st.radio(
         "**Selecciona la duración del examen:**",
         options=[15, 30, 60, "Sin límite"],
         horizontal=True,
+        format_func=lambda option: f"{option} min." if isinstance(option, int) else option
     )
 
     if st.button("🚀 Iniciar Nuevo Examen", type="primary", use_container_width=True):
@@ -104,11 +106,13 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
             st.rerun()
         
         minutes, seconds = divmod(int(remaining_time), 60)
-        st.info(f"**Tiempo restante: {minutes:02d}:{seconds:02d}**")
-        time.sleep(1) # Pequeña pausa para que el contador se actualice cada segundo
+        # Placeholder para mostrar el tiempo restante
+        timer_placeholder = st.empty()
+        timer_placeholder.info(f"**Tiempo restante: {minutes:02d}:{seconds:02d}**")
+        time.sleep(1) 
         st.rerun()
 
-    # CAMBIO 2: Navegación y presentación
+    # Navegación y presentación
     idx = st.session_state.current_question_index
     total_preguntas = len(st.session_state.preguntas_examen)
     
@@ -119,16 +123,13 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
     st.subheader(f"Pregunta {idx + 1}")
     st.markdown(f"### {q['pregunta']}")
     
-    # Usar st.radio permite cambiar la respuesta y guarda el estado automáticamente
     opciones_dict = q['opciones']
     opciones_display = [f"**{k}:** {v}" for k, v in opciones_dict.items()]
     opciones_keys = list(opciones_dict.keys())
     
-    # Añadir "Pasar" al principio
     opciones_display.insert(0, "⏩ Pasar (Omitir pregunta)")
     opciones_keys.insert(0, "Pasar")
     
-    # Recordar la respuesta anterior para esta pregunta
     previous_answer = st.session_state.respuestas.get(idx, "Pasar")
     if previous_answer in opciones_keys:
         current_selection_index = opciones_keys.index(previous_answer)
@@ -142,13 +143,11 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
         label_visibility="collapsed"
     )
     
-    # Guardar la respuesta actual
     selected_key_index = opciones_display.index(respuesta)
     st.session_state.respuestas[idx] = opciones_keys[selected_key_index]
     
     st.write("---")
 
-    # Botones de navegación
     col1, col2, col3 = st.columns([1, 2, 1])
 
     with col1:
@@ -178,7 +177,7 @@ elif st.session_state.examen_finalizado:
     pasadas = 0
 
     for i, q in enumerate(st.session_state.preguntas_examen):
-        respuesta_usr = st.session_state.respuestas.get(i, "Pasar") # Usar "Pasar" si no hay respuesta
+        respuesta_usr = st.session_state.respuestas.get(i, "Pasar")
         if respuesta_usr == q['respuesta_correcta']:
             puntuacion += 1
             correctas += 1
