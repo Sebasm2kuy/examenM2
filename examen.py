@@ -2,19 +2,18 @@ import streamlit as st
 import json
 import random
 
-# --- CONFIGURACIÓN DE LA PÁGINA (ESTO VA PRIMERO) ---
+# --- 1. CONFIGURACIÓN DE LA PÁGINA (CON TU ICONO) ---
 st.set_page_config(
     page_title="Examen Auxiliar de Farmacia",
-    page_icon="💊",
+    page_icon="https://raw.githubusercontent.com/Sebasm2kuy/examenM2/main/Copilot_20250704_171338.png",
     layout="centered"
 )
 
-# --- METADATOS PARA REDES SOCIALES (ESTO VA SEGUNDO) ---
-# Esto le dice a WhatsApp, Facebook, etc., qué mostrar cuando compartes el link.
+# --- 2. METADATOS PARA REDES SOCIALES (WHATSAPP, FACEBOOK, ETC.) ---
 st.markdown(
     """
     <meta property="og:title" content="Examen Auxiliar de Farmacia">
-    <meta property="og:description" content="Practica para el examen con 1000 preguntas aleatorias. ¡Cada intento es un nuevo desafío! Completamente gratis y sin límites.">
+    <meta property="og:description" content="Practica para el examen con preguntas aleatorias. ¡Cada intento es un nuevo desafío! Completamente gratis y sin límites.">
     <meta property="og:image" content="https://raw.githubusercontent.com/Sebasm2kuy/examenM2/main/Copilot_20250704_171338.png">
     <meta property="og:url" content="https://examenahhm2.streamlit.app/">
     <meta name="twitter:card" content="summary_large_image">
@@ -22,20 +21,20 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# --- 2. FUNCIÓN PARA CARGAR LAS PREGUNTAS ---
+# --- 3. FUNCIÓN PARA CARGAR LAS PREGUNTAS ---
 @st.cache_data
 def cargar_preguntas():
     try:
         with open('preguntas_modulo2.json', 'r', encoding='utf-8') as f:
             return json.load(f)
     except FileNotFoundError:
-        st.error("Error crítico: No se encontró 'preguntas_modulo2.json'.")
+        st.error("Error crítico: No se encontró 'preguntas_modulo2.json'. Asegúrate de que el archivo está en tu repositorio de GitHub.")
         return None
     except json.JSONDecodeError:
-        st.error("Error crítico: 'preguntas_modulo2.json' tiene un formato incorrecto.")
+        st.error("Error crítico: 'preguntas_modulo2.json' tiene un formato incorrecto. Por favor, revísalo con un validador de JSON.")
         return None
 
-# --- 3. INICIALIZACIÓN DEL ESTADO DE LA SESIÓN ---
+# --- 4. INICIALIZACIÓN DEL ESTADO DE LA SESIÓN ---
 if 'examen_en_curso' not in st.session_state:
     st.session_state.examen_en_curso = False
     st.session_state.preguntas_examen = []
@@ -107,7 +106,7 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
 elif st.session_state.examen_finalizado:
     st.header("🏁 Resultados del Examen")
     
-    puntuacion = 0.0  # <--- CAMBIO 1: Inicializado como decimal (float)
+    puntuacion = 0.0
     correctas = 0
     incorrectas = 0
     pasadas = 0
@@ -119,8 +118,8 @@ elif st.session_state.examen_finalizado:
             correctas += 1
         elif respuesta_usr == "Pasar":
             pasadas += 1
-        else: # Respuesta incorrecta
-            puntuacion -= 0.5  # <--- CAMBIO 2: Puntuación incorrecta ajustada
+        else:
+            puntuacion -= 0.5
             incorrectas += 1
 
     st.markdown(f"### Puntuación Final: **{puntuacion} puntos**")
