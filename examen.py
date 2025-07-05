@@ -8,6 +8,19 @@ st.set_page_config(
     page_icon="💊",
     layout="centered"
 )
+
+# --- METADATOS PARA REDES SOCIALES (ESTO VA SEGUNDO) ---
+# Esto le dice a WhatsApp, Facebook, etc., qué mostrar cuando compartes el link.
+st.markdown(
+    """
+    <meta property="og:title" content="Examen Auxiliar de Farmacia">
+    <meta property="og:description" content="Practica para el examen con 1000 preguntas aleatorias. ¡Cada intento es un nuevo desafío! Completamente gratis y sin límites.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/Sebasm2kuy/examenM2/main/Copilot_20250704_171338.png">
+    <meta property="og:url" content="https://examenahhm2.streamlit.app/">
+    <meta name="twitter:card" content="summary_large_image">
+    """,
+    unsafe_allow_html=True,
+)
 # --- 2. FUNCIÓN PARA CARGAR LAS PREGUNTAS ---
 @st.cache_data
 def cargar_preguntas():
