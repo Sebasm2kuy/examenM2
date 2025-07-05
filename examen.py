@@ -2,14 +2,14 @@ import streamlit as st
 import json
 import random
 
-# --- 1. CONFIGURACIÓN DE LA PÁGINA (CON TU ICONO) ---
+# --- 1. CONFIGURACIÓN DE LA PÁGINA (CON TU ICONO CORRECTO) ---
 st.set_page_config(
     page_title="Examen Auxiliar de Farmacia",
-    page_icon="https://raw.githubusercontent.com/Sebasm2kuy/examenM2/main/Copilot_20250704_171338.png",
+    page_icon="https://raw.githubusercontent.com/Sebasm2kuy/examenM2/main/Copilot_20250704_171338.png", # <--- ¡AQUÍ ESTÁ EL ENLACE CORRECTO!
     layout="centered"
 )
 
-# --- 2. METADATOS PARA REDES SOCIALES (WHATSAPP, FACEBOOK, ETC.) ---
+# --- 2. METADATOS PARA REDES SOCIALES (CON TU IMAGEN CORRECTA) ---
 st.markdown(
     """
     <meta property="og:title" content="Examen Auxiliar de Farmacia">
