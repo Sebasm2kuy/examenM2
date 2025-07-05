@@ -144,3 +144,15 @@ elif st.session_state.examen_finalizado:
                 texto_usr = q['opciones'].get(resp_usr, "INVÁLIDA")
                 st.error(f"❌ Tu respuesta fue '{resp_usr}: {texto_usr}'.")
                 st.info(f"✔️ La respuesta correcta era '{letra_ok}: {texto_ok}'.")
+    
+    # ### <<< INICIO DEL CÓDIGO AÑADIDO >>> ###
+    st.write("---")
+    if st.button("🔄 Iniciar Otro Examen", type="primary", use_container_width=True):
+        # Resetea el estado de la sesión para volver a la pantalla de inicio
+        st.session_state.examen_en_curso = False
+        st.session_state.preguntas_examen = []
+        st.session_state.respuestas = {}
+        st.session_state.current_question_index = 0
+        st.session_state.examen_finalizado = False
+        st.rerun()
+    # ### <<< FIN DEL CÓDIGO AÑADIDO >>> ###
