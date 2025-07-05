@@ -6,10 +6,10 @@ import random
 st.set_page_config(
     page_title="Examen Auxiliar de Farmacia",
     page_icon="💊",
-    layout="centered"  # Centered layout se ve mejor para una pregunta a la vez
+    layout="centered"
 )
 
-# --- 2. FUNCIÓN PARA CARGAR LAS PREGUNTAS (Sin cambios) ---
+# --- 2. FUNCIÓN PARA CARGAR LAS PREGUNTAS ---
 @st.cache_data
 def cargar_preguntas():
     try:
@@ -23,7 +23,6 @@ def cargar_preguntas():
         return None
 
 # --- 3. INICIALIZACIÓN DEL ESTADO DE LA SESIÓN ---
-# session_state es la memoria de Streamlit para cada usuario.
 if 'examen_en_curso' not in st.session_state:
     st.session_state.examen_en_curso = False
     st.session_state.preguntas_examen = []
@@ -33,15 +32,13 @@ if 'examen_en_curso' not in st.session_state:
 
 # --- LÓGICA PRINCIPAL DE LA APP ---
 
-# Título principal
 st.title("📝 Examen Módulo 2: Auxiliar de Farmacia Hospitalaria")
 
-# Cargar el banco de preguntas completo
 todas_las_preguntas = cargar_preguntas()
 if not todas_las_preguntas:
     st.stop()
 
-# --- VISTA DE INICIO (Cuando no hay un examen en curso) ---
+# --- VISTA DE INICIO ---
 if not st.session_state.examen_en_curso and not st.session_state.examen_finalizado:
     st.write("""
     **Instrucciones del examen:**
@@ -53,14 +50,12 @@ if not st.session_state.examen_en_curso and not st.session_state.examen_finaliza
         if len(todas_las_preguntas) < 30:
             st.warning("Advertencia: El banco de preguntas tiene menos de 30. No se puede generar un examen.")
         else:
-            # Reiniciar el estado para un nuevo examen
             st.session_state.preguntas_examen = random.sample(todas_las_preguntas, 30)
             st.session_state.respuestas = {}
             st.session_state.current_question_index = 0
             st.session_state.examen_en_curso = True
             st.session_state.examen_finalizado = False
-            st.rerun() # Recargar la app para empezar el examen
-
+            st.rerun()
 
 # --- VISTA DURANTE EL EXAMEN ---
 elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado:
@@ -68,42 +63,34 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
     idx = st.session_state.current_question_index
     total_preguntas = len(st.session_state.preguntas_examen)
     
-    # Barra de progreso
     st.progress((idx + 1) / total_preguntas, text=f"Pregunta {idx + 1} de {total_preguntas}")
-
-    # Obtener la pregunta actual
+    
     q = st.session_state.preguntas_examen[idx]
     
     st.subheader(f"Pregunta {idx + 1}")
     st.markdown(f"### {q['pregunta']}")
+    st.write("")
     
-    st.write("") # Espacio
-    
-    # Función para manejar la lógica de los botones
     def registrar_respuesta(respuesta):
         st.session_state.respuestas[idx] = respuesta
-        # Avanzar a la siguiente pregunta
         if st.session_state.current_question_index < total_preguntas - 1:
             st.session_state.current_question_index += 1
-        else: # Si es la última pregunta, finalizar el examen
+        else:
             st.session_state.examen_en_curso = False
             st.session_state.examen_finalizado = True
         st.rerun()
 
-    # Mostrar opciones como botones
     opciones = q['opciones']
     for opcion_letra, opcion_texto in opciones.items():
         if st.button(f"**{opcion_letra}:** {opcion_texto}", use_container_width=True):
             registrar_respuesta(opcion_letra)
     
-    st.write("") # Espacio
+    st.write("")
     
-    # Botón de "Pasar" con un estilo diferente
     if st.button("⏩ Pasar (Omitir pregunta)", use_container_width=True, type="secondary"):
         registrar_respuesta("Pasar")
 
-
-# --- VISTA DE RESULTADOS (Cuando el examen ha finalizado) ---
+# --- VISTA DE RESULTADOS ---
 elif st.session_state.examen_finalizado:
     st.header("🏁 Resultados del Examen")
     
@@ -146,8 +133,15 @@ elif st.session_state.examen_finalizado:
                 st.error(f"❌ Tu respuesta fue '{resp_usr}: {texto_usr}'.")
                 st.info(f"✔️ La respuesta correcta era '{letra_ok}: {texto_ok}'.")
 
-    # Botón para volver a empezar
-    if st.button("↩️ Volver a la pantalla de inicio", use_container_width=True):
+    st.write("---") # Una línea para separar
+    
+    # --- CAMBIO REALIZADO AQUÍ ---
+    # Este botón ahora inicia un nuevo examen directamente.
+    if st.button("🚀 Iniciar Nuevo Examen", type="primary", use_container_width=True):
+        # La misma lógica que el botón de la pantalla de inicio
+        st.session_state.preguntas_examen = random.sample(todas_las_preguntas, 30)
+        st.session_state.respuestas = {}
+        st.session_state.current_question_index = 0
+        st.session_state.examen_en_curso = True
         st.session_state.examen_finalizado = False
-        st.session_state.examen_en_curso = False
         st.rerun()
