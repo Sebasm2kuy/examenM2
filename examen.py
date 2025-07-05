@@ -3,7 +3,7 @@ import json
 import random
 import time
 
-# --- 1. CONFIGURACIÓN DE LA PÁGINA (CON EL ENLACE ESPECIAL) ---
+# --- 1. CONFIGURACIÓN DE LA PÁGINA ---
 st.set_page_config(
     page_title="Examen Auxiliar de Farmacia",
     page_icon="https://github.com/Sebasm2kuy/examenM2/blob/main/Copilot_20250704_171338.png?raw=true",
@@ -63,8 +63,6 @@ if not st.session_state.examen_en_curso and not st.session_state.examen_finaliza
     - **Tiempo:** Elige un límite de tiempo. Si se acaba, el examen se entregará automáticamente.
     """)
     
-    # ### <<< CAMBIO AQUÍ >>> ###
-    # Se añade el parámetro 'format_func' para cambiar cómo se muestran las opciones.
     time_option_minutes = st.radio(
         "**Selecciona la duración del examen:**",
         options=[15, 30, 60, "Sin límite"],
@@ -76,46 +74,50 @@ if not st.session_state.examen_en_curso and not st.session_state.examen_finaliza
         if len(todas_las_preguntas) < 30:
             st.warning("Advertencia: El banco de preguntas tiene menos de 30.")
         else:
-            # Configurar estado del examen
             st.session_state.preguntas_examen = random.sample(todas_las_preguntas, 30)
-            st.session_state.respuestas = {i: "Pasar" for i in range(30)} # Pre-llenar todas como "Pasar"
+            st.session_state.respuestas = {i: "Pasar" for i in range(30)}
             st.session_state.current_question_index = 0
             st.session_state.examen_en_curso = True
             st.session_state.examen_finalizado = False
             
-            # Configurar temporizador
             st.session_state.start_time = time.time()
             if isinstance(time_option_minutes, int):
                 st.session_state.duration_seconds = time_option_minutes * 60
             else:
-                st.session_state.duration_seconds = 0 # 0 para sin límite
+                st.session_state.duration_seconds = 0
             st.rerun()
 
 # --- VISTA DURANTE EL EXAMEN ---
 elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado:
     
-    # Lógica del temporizador
+    # ### <<< INICIO DE LA CORRECCIÓN >>> ###
+    
+    # Primero, se calcula el tiempo restante.
+    remaining_time = st.session_state.duration_seconds
     if st.session_state.duration_seconds > 0:
         elapsed_time = time.time() - st.session_state.start_time
         remaining_time = st.session_state.duration_seconds - elapsed_time
-
+        
+        # Si el tiempo se acabó, se termina el examen y se sale de esta sección.
         if remaining_time <= 0:
-            st.warning("⏰ ¡Se acabó el tiempo! El examen se ha entregado automáticamente.")
             st.session_state.examen_en_curso = False
             st.session_state.examen_finalizado = True
+            st.warning("⏰ ¡Se acabó el tiempo! El examen se ha entregado automáticamente.")
+            # Pequeña pausa para que el usuario vea el mensaje antes de recargar
+            time.sleep(2)
             st.rerun()
-        
-        minutes, seconds = divmod(int(remaining_time), 60)
-        # Placeholder para mostrar el tiempo restante
-        timer_placeholder = st.empty()
-        timer_placeholder.info(f"**Tiempo restante: {minutes:02d}:{seconds:02d}**")
-        time.sleep(1) 
-        st.rerun()
 
-    # Navegación y presentación
+    # Segundo, se muestra la pregunta y los controles de navegación.
+    # Esta parte ahora SIEMPRE se ejecuta, sin importar si hay tiempo o no.
+    
     idx = st.session_state.current_question_index
     total_preguntas = len(st.session_state.preguntas_examen)
     
+    # Mostrar el reloj (si está activo)
+    if st.session_state.duration_seconds > 0:
+        minutes, seconds = divmod(int(remaining_time), 60)
+        st.info(f"**Tiempo restante: {minutes:02d}:{seconds:02d}**")
+        
     st.progress((idx + 1) / total_preguntas, text=f"Pregunta {idx + 1} de {total_preguntas}")
     
     q = st.session_state.preguntas_examen[idx]
@@ -131,10 +133,7 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
     opciones_keys.insert(0, "Pasar")
     
     previous_answer = st.session_state.respuestas.get(idx, "Pasar")
-    if previous_answer in opciones_keys:
-        current_selection_index = opciones_keys.index(previous_answer)
-    else:
-        current_selection_index = 0
+    current_selection_index = opciones_keys.index(previous_answer) if previous_answer in opciones_keys else 0
 
     respuesta = st.radio(
         "Selecciona tu respuesta:",
@@ -165,6 +164,13 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
         st.session_state.examen_en_curso = False
         st.session_state.examen_finalizado = True
         st.rerun()
+
+    # Tercero, y solo si hay un temporizador activo, se fuerza la recarga para actualizar el reloj.
+    if st.session_state.duration_seconds > 0:
+        time.sleep(1)
+        st.rerun()
+
+    # ### <<< FIN DE LA CORRECCIÓN >>> ###
 
 
 # --- VISTA DE RESULTADOS ---
