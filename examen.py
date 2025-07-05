@@ -133,15 +133,13 @@ elif st.session_state.examen_finalizado:
                 st.error(f"❌ Tu respuesta fue '{resp_usr}: {texto_usr}'.")
                 st.info(f"✔️ La respuesta correcta era '{letra_ok}: {texto_ok}'.")
 
-    st.write("---") # Una línea para separar
-    
-    # --- CAMBIO REALIZADO AQUÍ ---
-    # Este botón ahora inicia un nuevo examen directamente.
-    if st.button("🚀 Iniciar Nuevo Examen", type="primary", use_container_width=True):
-        # La misma lógica que el botón de la pantalla de inicio
-        st.session_state.preguntas_examen = random.sample(todas_las_preguntas, 30)
-        st.session_state.respuestas = {}
-        st.session_state.current_question_index = 0
-        st.session_state.examen_en_curso = True
-        st.session_state.examen_finalizado = False
-        st.rerun()
+    st.markdown(
+    """
+    <meta property="og:title" content="Examen Auxiliar de Farmacia">
+    <meta property="og:description" content="Practica para el examen con 1000 preguntas aleatorias. ¡Cada intento es un nuevo desafío! Completamente gratis y sin límites.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/Sebasm2kuy/examenM2/main/Copilot_20250704_171338.png">
+    <meta property="og:url" content="https://examenahhm2.streamlit.app/">
+    <meta name="twitter:card" content="summary_large_image">
+    """,
+    unsafe_allow_html=True,
+)
