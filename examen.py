@@ -2,13 +2,12 @@ import streamlit as st
 import json
 import random
 
-# --- 1. CONFIGURACIÓN DE LA PÁGINA ---
+# --- CONFIGURACIÓN DE LA PÁGINA (ESTO VA PRIMERO) ---
 st.set_page_config(
     page_title="Examen Auxiliar de Farmacia",
     page_icon="💊",
     layout="centered"
 )
-
 # --- 2. FUNCIÓN PARA CARGAR LAS PREGUNTAS ---
 @st.cache_data
 def cargar_preguntas():
