@@ -21,6 +21,7 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
 # --- 2. FUNCIÓN PARA CARGAR LAS PREGUNTAS ---
 @st.cache_data
 def cargar_preguntas():
@@ -56,7 +57,7 @@ if not st.session_state.examen_en_curso and not st.session_state.examen_finaliza
     **Instrucciones del examen:**
     - **Cantidad:** 30 preguntas seleccionadas al azar.
     - **Navegación:** Responde a cada pregunta para avanzar a la siguiente.
-    - **Puntuación:** +1 Correcta, -1 Incorrecta, 0 Omitida ("Pasar").
+    - **Puntuación:** +1 Correcta, -0.5 Incorrecta, 0 Omitida ("Pasar").
     """)
     if st.button("🚀 Iniciar Nuevo Examen", type="primary", use_container_width=True):
         if len(todas_las_preguntas) < 30:
@@ -106,7 +107,7 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
 elif st.session_state.examen_finalizado:
     st.header("🏁 Resultados del Examen")
     
-    puntuacion = 0
+    puntuacion = 0.0  # <--- CAMBIO 1: Inicializado como decimal (float)
     correctas = 0
     incorrectas = 0
     pasadas = 0
@@ -118,8 +119,8 @@ elif st.session_state.examen_finalizado:
             correctas += 1
         elif respuesta_usr == "Pasar":
             pasadas += 1
-        else:
-            puntuacion -= 1
+        else: # Respuesta incorrecta
+            puntuacion -= 0.5  # <--- CAMBIO 2: Puntuación incorrecta ajustada
             incorrectas += 1
 
     st.markdown(f"### Puntuación Final: **{puntuacion} puntos**")
@@ -144,14 +145,3 @@ elif st.session_state.examen_finalizado:
                 texto_usr = q['opciones'].get(resp_usr, "INVÁLIDA")
                 st.error(f"❌ Tu respuesta fue '{resp_usr}: {texto_usr}'.")
                 st.info(f"✔️ La respuesta correcta era '{letra_ok}: {texto_ok}'.")
-
-    st.markdown(
-    """
-    <meta property="og:title" content="Examen Auxiliar de Farmacia">
-    <meta property="og:description" content="Practica para el examen con 1000 preguntas aleatorias. ¡Cada intento es un nuevo desafío! Completamente gratis y sin límites.">
-    <meta property="og:image" content="https://raw.githubusercontent.com/Sebasm2kuy/examenM2/main/Copilot_20250704_171338.png">
-    <meta property="og:url" content="https://examenahhm2.streamlit.app/">
-    <meta name="twitter:card" content="summary_large_image">
-    """,
-    unsafe_allow_html=True,
-)
