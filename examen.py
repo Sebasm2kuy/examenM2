@@ -160,18 +160,20 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
     
     st.write("---") 
 
-    # ### <<< CAMBIO CLAVE: Botones de navegación en 3 columnas para forzar el espaciado >>> ###
-    col1, col2, col3 = st.columns([2, 1, 2]) # [Anterior, Espacio Vacío, Siguiente]
+    # ### <<< CAMBIO CLAVE Y FINAL: Contenedor para los botones de navegación >>> ###
+    nav_container = st.container()
+    with nav_container:
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("⬅️ **Atrás**", use_container_width=True, disabled=(idx == 0)):
+                st.session_state.current_question_index -= 1
+                st.rerun()
+        
+        with col2:
+            if st.button("**Siguiente** ➡️", use_container_width=True, disabled=(idx == total_preguntas - 1)):
+                st.session_state.current_question_index += 1
+                st.rerun()
 
-    with col1:
-        if st.button("⬅️ Anterior", use_container_width=True, disabled=(idx == 0)):
-            st.session_state.current_question_index -= 1
-            st.rerun()
-    
-    with col3:
-        if st.button("Siguiente ➡️", use_container_width=True, disabled=(idx == total_preguntas - 1)):
-            st.session_state.current_question_index += 1
-            st.rerun()
 
     if st.session_state.duration_seconds > 0:
         time.sleep(1)
