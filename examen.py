@@ -2,6 +2,7 @@ import streamlit as st
 import json
 import random
 import time
+import math # Importado para la simulación del contador
 
 # --- 1. CONFIGURACIÓN DE LA PÁGINA ---
 st.set_page_config(
@@ -35,6 +36,21 @@ def cargar_preguntas():
         st.error("Error crítico: 'preguntas_modulo2.json' tiene un formato incorrecto. Por favor, revísalo con un validador de JSON.")
         return None
 
+# ### <<< CAMBIO 1: FUNCIÓN PARA EL CONTADOR DE USUARIOS SIMULADO >>> ###
+def get_fake_online_users():
+    """
+    Crea un número de usuarios online que varía suavemente a lo largo del día
+    para dar una sensación realista de actividad.
+    """
+    # Base de usuarios + variación sinusoidal para el ciclo día/noche + ruido aleatorio
+    base_users = 5
+    # La función seno crea un ciclo suave cada 24 horas (86400 segundos)
+    sin_variation = math.sin(time.time() * (2 * math.pi / 86400)) * 3 
+    random_noise = random.randint(-2, 2)
+    
+    online_users = int(base_users + sin_variation + random_noise)
+    return max(online_users, 3) # Asegura que siempre haya al menos 3 usuarios
+
 # --- 4. INICIALIZACIÓN DEL ESTADO DE LA SESIÓN ---
 if 'examen_en_curso' not in st.session_state:
     st.session_state.examen_en_curso = False
@@ -55,6 +71,12 @@ if not todas_las_preguntas:
 
 # --- VISTA DE INICIO ---
 if not st.session_state.examen_en_curso and not st.session_state.examen_finalizado:
+    
+    # ### <<< CAMBIO 1: MOSTRAR EL CONTADOR DE USUARIOS >>> ###
+    online_users = get_fake_online_users()
+    st.markdown(f"**<span style='color: #28a745;'>●</span> {online_users} estudiantes online**", unsafe_allow_html=True)
+    st.write("---")
+
     st.write("""
     **Instrucciones del examen:**
     - **Cantidad:** 30 preguntas seleccionadas al azar.
@@ -90,26 +112,18 @@ if not st.session_state.examen_en_curso and not st.session_state.examen_finaliza
 # --- VISTA DURANTE EL EXAMEN ---
 elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado:
     
-    # ### <<< INICIO DE LA CORRECCIÓN >>> ###
-    
-    # Primero, se calcula el tiempo restante.
     remaining_time = st.session_state.duration_seconds
     if st.session_state.duration_seconds > 0:
         elapsed_time = time.time() - st.session_state.start_time
         remaining_time = st.session_state.duration_seconds - elapsed_time
         
-        # Si el tiempo se acabó, se termina el examen y se sale de esta sección.
         if remaining_time <= 0:
             st.session_state.examen_en_curso = False
             st.session_state.examen_finalizado = True
             st.warning("⏰ ¡Se acabó el tiempo! El examen se ha entregado automáticamente.")
-            # Pequeña pausa para que el usuario vea el mensaje antes de recargar
             time.sleep(2)
             st.rerun()
 
-    # Segundo, se muestra la pregunta y los controles de navegación.
-    # Esta parte ahora SIEMPRE se ejecuta, sin importar si hay tiempo o no.
-    
     idx = st.session_state.current_question_index
     total_preguntas = len(st.session_state.preguntas_examen)
     
@@ -119,6 +133,27 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
         st.info(f"**Tiempo restante: {minutes:02d}:{seconds:02d}**")
         
     st.progress((idx + 1) / total_preguntas, text=f"Pregunta {idx + 1} de {total_preguntas}")
+
+    # ### <<< CAMBIO 2: BARRA DE NAVEGACIÓN Y ACCIÓN SUPERIOR >>> ###
+    st.write("---") # Separador visual
+    col1, col2, col3 = st.columns([1, 2, 1])
+
+    with col1:
+        if st.button("⬅️ Anterior", use_container_width=True, disabled=(idx == 0)):
+            st.session_state.current_question_index -= 1
+            st.rerun()
+    
+    with col2:
+        if st.button("🚨 Entregar Examen", use_container_width=True, type="primary"):
+            st.session_state.examen_en_curso = False
+            st.session_state.examen_finalizado = True
+            st.rerun()
+
+    with col3:
+        if st.button("Siguiente ➡️", use_container_width=True, disabled=(idx == total_preguntas - 1)):
+            st.session_state.current_question_index += 1
+            st.rerun()
+    st.write("---") # Otro separador visual
     
     q = st.session_state.preguntas_examen[idx]
     
@@ -145,33 +180,11 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
     selected_key_index = opciones_display.index(respuesta)
     st.session_state.respuestas[idx] = opciones_keys[selected_key_index]
     
-    st.write("---")
+    # Se eliminan los botones que estaban aquí abajo
 
-    col1, col2, col3 = st.columns([1, 2, 1])
-
-    with col1:
-        if st.button("⬅️ Anterior", use_container_width=True, disabled=(idx == 0)):
-            st.session_state.current_question_index -= 1
-            st.rerun()
-    
-    with col3:
-        if st.button("Siguiente ➡️", use_container_width=True, disabled=(idx == total_preguntas - 1)):
-            st.session_state.current_question_index += 1
-            st.rerun()
-
-    st.write("")
-    if st.button("🚨 Entregar Examen y Ver Resultados", type="primary", use_container_width=True):
-        st.session_state.examen_en_curso = False
-        st.session_state.examen_finalizado = True
-        st.rerun()
-
-    # Tercero, y solo si hay un temporizador activo, se fuerza la recarga para actualizar el reloj.
     if st.session_state.duration_seconds > 0:
         time.sleep(1)
         st.rerun()
-
-    # ### <<< FIN DE LA CORRECCIÓN >>> ###
-
 
 # --- VISTA DE RESULTADOS ---
 elif st.session_state.examen_finalizado:
