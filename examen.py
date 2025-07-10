@@ -56,7 +56,10 @@ if 'examen_en_curso' not in st.session_state:
 
 # --- LÓGICA PRINCIPAL DE LA APP ---
 
-st.title("📝 Examen Módulo 2: Auxiliar de Farmacia Hospitalaria")
+# ### <<< CAMBIO 1: Título reducido para mejor visualización en móvil >>> ###
+st.header("📝 Examen Módulo 2")
+st.subheader("Auxiliar de Farmacia Hospitalaria")
+
 
 todas_las_preguntas = cargar_preguntas()
 if not todas_las_preguntas:
@@ -126,8 +129,6 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
     st.progress((idx + 1) / total_preguntas, text=f"Pregunta {idx + 1} de {total_preguntas}")
     st.write("---")
     
-    # ### <<< INICIO DEL CAMBIO >>> ###
-    # Se muestra PRIMERO la pregunta y las opciones
     q = st.session_state.preguntas_examen[idx]
     
     st.subheader(f"Pregunta {idx + 1}")
@@ -153,10 +154,10 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
     selected_key_index = opciones_display.index(respuesta)
     st.session_state.respuestas[idx] = opciones_keys[selected_key_index]
     
-    st.write("---") # Separador visual antes de los botones
+    st.write("---") 
 
-    # Y ahora se muestra la BARRA DE NAVEGACIÓN AL FINAL del contenido
-    col1, col2, col3 = st.columns([1, 2, 1])
+    # ### <<< CAMBIO 2: Columnas con el mismo ancho para evitar que se apilen >>> ###
+    col1, col2, col3 = st.columns(3)
 
     with col1:
         if st.button("⬅️ Anterior", use_container_width=True, disabled=(idx == 0)):
@@ -164,7 +165,7 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
             st.rerun()
     
     with col2:
-        if st.button("🚨 Entregar Examen", use_container_width=True, type="primary"):
+        if st.button("🚨 Entregar", use_container_width=True, type="primary"): # Texto acortado
             st.session_state.examen_en_curso = False
             st.session_state.examen_finalizado = True
             st.rerun()
@@ -173,7 +174,6 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
         if st.button("Siguiente ➡️", use_container_width=True, disabled=(idx == total_preguntas - 1)):
             st.session_state.current_question_index += 1
             st.rerun()
-    # ### <<< FIN DEL CAMBIO >>> ###
 
     if st.session_state.duration_seconds > 0:
         time.sleep(1)
