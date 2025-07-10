@@ -9608,5 +9608,14 @@
             "C": "La producción de bilis."
         },
         "respuesta_correcta": "A"
-    }
+    },
+     "id": 9999,
+    "pregunta": "Esta pregunta es un placebo. En el contexto de un examen largo, ¿cuál es su verdadera función terapéutica?",
+    "opciones": {
+      "A": "Evaluar la atención del estudiante a los detalles.",
+      "B": "Aumentar artificialmente la dificultad del examen.",
+      "C": "Servir como un descanso y dar un punto gratis de ánimo."
+    },
+    "respuesta_correcta": "C"
+}
 ]
