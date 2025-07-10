@@ -148,19 +148,32 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
     previous_answer = st.session_state.respuestas.get(idx, "Pasar")
     current_selection_index = opciones_keys.index(previous_answer) if previous_answer in opciones_keys else 0
 
-    respuesta = st.radio(
+    respuesta_display = st.radio(
         "Selecciona tu respuesta:",
         options=opciones_display,
         index=current_selection_index,
         label_visibility="collapsed"
     )
     
-    selected_key_index = opciones_display.index(respuesta)
-    st.session_state.respuestas[idx] = opciones_keys[selected_key_index]
+    selected_key_index = opciones_display.index(respuesta_display)
+    respuesta_seleccionada = opciones_keys[selected_key_index]
+    st.session_state.respuestas[idx] = respuesta_seleccionada
     
+    # ### <<< INICIO DEL NUEVO EASTER EGG >>> ###
+    if q.get("id") == 9999 and respuesta_seleccionada == "C":
+        st.balloons()
+        st.success("¡Efecto Placebo Activado!")
+        st.code("""
+        .-------.
+       (   :)  )
+        '-------'
+        """, language="text")
+        st.info("A veces, la mejor respuesta es tomarse un respiro. ¡Ánimo con el examen, vas genial!")
+        time.sleep(7)
+    # ### <<< FIN DEL NUEVO EASTER EGG >>> ###
+        
     st.write("---") 
 
-    # ### <<< CAMBIO CLAVE Y FINAL: Contenedor para los botones de navegación >>> ###
     nav_container = st.container()
     with nav_container:
         col1, col2 = st.columns(2)
@@ -174,7 +187,6 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
                 st.session_state.current_question_index += 1
                 st.rerun()
 
-
     if st.session_state.duration_seconds > 0:
         time.sleep(1)
         st.rerun()
@@ -187,46 +199,3 @@ elif st.session_state.examen_finalizado:
     correctas = 0
     incorrectas = 0
     pasadas = 0
-
-    for i, q in enumerate(st.session_state.preguntas_examen):
-        respuesta_usr = st.session_state.respuestas.get(i, "Pasar")
-        if respuesta_usr == q['respuesta_correcta']:
-            puntuacion += 1
-            correctas += 1
-        elif respuesta_usr == "Pasar":
-            pasadas += 1
-        else:
-            puntuacion -= 0.5
-            incorrectas += 1
-
-    st.markdown(f"### Puntuación Final: **{puntuacion} puntos**")
-    st.markdown(f"- ✅ **Respuestas Correctas:** `{correctas}`")
-    st.markdown(f"- ❌ **Respuestas Incorrectas:** `{incorrectas}`")
-    st.markdown(f"- ⏩ **Preguntas Omitidas:** `{pasadas}`")
-
-    with st.expander("🔍 Ver corrección detallada"):
-        for i, q in enumerate(st.session_state.preguntas_examen):
-            st.markdown("---")
-            st.markdown(f"**Pregunta {i+1}:** {q['pregunta']}")
-            
-            resp_usr = st.session_state.respuestas.get(i, "Pasar")
-            letra_ok = q['respuesta_correcta']
-            texto_ok = q['opciones'][letra_ok]
-
-            if resp_usr == letra_ok:
-                st.success(f"✔️ Tu respuesta fue '{resp_usr}: {q['opciones'][resp_usr]}'. ¡Correcto!")
-            elif resp_usr == "Pasar":
-                st.info(f"⏩ Omitida. La respuesta correcta era: '{letra_ok}: {texto_ok}'.")
-            else:
-                texto_usr = q['opciones'].get(resp_usr, "INVÁLIDA")
-                st.error(f"❌ Tu respuesta fue '{resp_usr}: {texto_usr}'.")
-                st.info(f"✔️ La respuesta correcta era '{letra_ok}: {texto_ok}'.")
-    
-    st.write("---")
-    if st.button("🔄 Iniciar Otro Examen", type="primary", use_container_width=True):
-        st.session_state.examen_en_curso = False
-        st.session_state.examen_finalizado = False
-        st.session_state.preguntas_examen = []
-        st.session_state.respuestas = {}
-        st.session_state.current_question_index = 0
-        st.rerun()
