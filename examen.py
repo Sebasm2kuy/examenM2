@@ -63,7 +63,6 @@ if not todas_las_preguntas:
 # --- VISTA DE INICIO ---
 if not st.session_state.examen_en_curso and not st.session_state.examen_finalizado:
     
-    # ### <<< CAMBIO 1: Título aún más compacto y centrado >>> ###
     st.markdown("<h2 style='text-align: center; margin-bottom: -15px;'>📝 Examen Módulo 2</h2>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center;'>Auxiliar de Farmacia Hospitalaria</p>", unsafe_allow_html=True)
     
@@ -71,7 +70,6 @@ if not st.session_state.examen_en_curso and not st.session_state.examen_finaliza
     st.markdown(f"<p style='text-align: center; color: #28a745; margin-top: -10px;'>● {online_users} estudiantes online</p>", unsafe_allow_html=True)
     st.write("---")
 
-    # ### <<< CAMBIO 2: Instrucciones ocultas en un menú desplegable >>> ###
     with st.expander("📖 Ver Instrucciones del Examen"):
         st.markdown("""
         - **Cantidad:** 30 preguntas seleccionadas al azar.
@@ -80,9 +78,8 @@ if not st.session_state.examen_en_curso and not st.session_state.examen_finaliza
         - **Tiempo:** Elige un límite de tiempo. Si se acaba, el examen se entregará automáticamente.
         """)
     
-    # ### <<< CAMBIO 3: Etiqueta del radio más corta >>> ###
     time_option_minutes = st.radio(
-        "**Duración:**", # Etiqueta mucho más corta
+        "**Duración:**",
         options=[15, 30, 60, "Sin límite"],
         horizontal=True,
         format_func=lambda option: f"{option} min." if isinstance(option, int) else option
@@ -163,14 +160,15 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
     
     st.write("---") 
 
-    col1, col2 = st.columns(2)
+    # ### <<< CAMBIO CLAVE: Botones de navegación en 3 columnas para forzar el espaciado >>> ###
+    col1, col2, col3 = st.columns([2, 1, 2]) # [Anterior, Espacio Vacío, Siguiente]
 
     with col1:
         if st.button("⬅️ Anterior", use_container_width=True, disabled=(idx == 0)):
             st.session_state.current_question_index -= 1
             st.rerun()
     
-    with col2:
+    with col3:
         if st.button("Siguiente ➡️", use_container_width=True, disabled=(idx == total_preguntas - 1)):
             st.session_state.current_question_index += 1
             st.rerun()
