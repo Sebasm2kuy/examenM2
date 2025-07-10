@@ -56,11 +56,6 @@ if 'examen_en_curso' not in st.session_state:
 
 # --- LÓGICA PRINCIPAL DE LA APP ---
 
-# ### <<< CAMBIO 1: Título reducido para mejor visualización en móvil >>> ###
-st.header("📝 Examen Módulo 2")
-st.subheader("Auxiliar de Farmacia Hospitalaria")
-
-
 todas_las_preguntas = cargar_preguntas()
 if not todas_las_preguntas:
     st.stop()
@@ -68,8 +63,12 @@ if not todas_las_preguntas:
 # --- VISTA DE INICIO ---
 if not st.session_state.examen_en_curso and not st.session_state.examen_finalizado:
     
+    # ### <<< CAMBIO 1: Título con tamaño controlado y que solo aparece en esta pantalla >>> ###
+    st.markdown("<h3 style='text-align: center; margin-bottom: -15px;'>📝 Examen Módulo 2</h3>", unsafe_allow_html=True)
+    st.markdown("<h4 style='text-align: center; font-weight: normal;'>Auxiliar de Farmacia Hospitalaria</h4>", unsafe_allow_html=True)
+    
     online_users = get_fake_online_users()
-    st.markdown(f"**<span style='color: #28a745;'>●</span> {online_users} estudiantes online**", unsafe_allow_html=True)
+    st.markdown(f"<p style='text-align: center; color: #28a745;'>● {online_users} estudiantes online</p>", unsafe_allow_html=True)
     st.write("---")
 
     st.write("""
@@ -105,6 +104,7 @@ if not st.session_state.examen_en_curso and not st.session_state.examen_finaliza
             st.rerun()
 
 # --- VISTA DURANTE EL EXAMEN ---
+# ### <<< CAMBIO 2: Ya no hay título aquí, la pantalla empieza directamente con el reloj >>> ###
 elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado:
     
     remaining_time = st.session_state.duration_seconds
@@ -156,7 +156,6 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
     
     st.write("---") 
 
-    # ### <<< CAMBIO 2: Columnas con el mismo ancho para evitar que se apilen >>> ###
     col1, col2, col3 = st.columns(3)
 
     with col1:
@@ -165,7 +164,7 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
             st.rerun()
     
     with col2:
-        if st.button("🚨 Entregar", use_container_width=True, type="primary"): # Texto acortado
+        if st.button("🚨 Entregar", use_container_width=True, type="primary"):
             st.session_state.examen_en_curso = False
             st.session_state.examen_finalizado = True
             st.rerun()
