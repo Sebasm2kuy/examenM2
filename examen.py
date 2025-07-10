@@ -30,10 +30,10 @@ def cargar_preguntas():
         with open('preguntas_modulo2.json', 'r', encoding='utf-8') as f:
             return json.load(f)
     except FileNotFoundError:
-        st.error("Error crítico: No se encontró 'preguntas_modulo2.json'. Asegúrate de que el archivo está en tu repositorio de GitHub.")
+        st.error("Error crítico: No se encontró 'preguntas_modulo2.json'.")
         return None
     except json.JSONDecodeError:
-        st.error("Error crítico: 'preguntas_modulo2.json' tiene un formato incorrecto. Por favor, revísalo con un validador de JSON.")
+        st.error("Error crítico: 'preguntas_modulo2.json' tiene un formato incorrecto.")
         return None
 
 # --- FUNCIÓN PARA CONTADOR SIMULADO ---
@@ -63,9 +63,9 @@ if not todas_las_preguntas:
 # --- VISTA DE INICIO ---
 if not st.session_state.examen_en_curso and not st.session_state.examen_finalizado:
     
-    # ### <<< CAMBIO 1: Título con tamaño controlado y que solo aparece en esta pantalla >>> ###
-    st.markdown("<h3 style='text-align: center; margin-bottom: -15px;'>📝 Examen Módulo 2</h3>", unsafe_allow_html=True)
-    st.markdown("<h4 style='text-align: center; font-weight: normal;'>Auxiliar de Farmacia Hospitalaria</h4>", unsafe_allow_html=True)
+    # ### <<< CAMBIO 1: Título mucho más pequeño (usando font-size explícito) >>> ###
+    st.markdown("<p style='text-align: center; font-size: 22px; font-weight: bold; margin-bottom: -10px;'>📝 Examen Módulo 2</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; font-size: 18px; font-weight: normal;'>Auxiliar de Farmacia Hospitalaria</p>", unsafe_allow_html=True)
     
     online_users = get_fake_online_users()
     st.markdown(f"<p style='text-align: center; color: #28a745;'>● {online_users} estudiantes online</p>", unsafe_allow_html=True)
@@ -104,7 +104,6 @@ if not st.session_state.examen_en_curso and not st.session_state.examen_finaliza
             st.rerun()
 
 # --- VISTA DURANTE EL EXAMEN ---
-# ### <<< CAMBIO 2: Ya no hay título aquí, la pantalla empieza directamente con el reloj >>> ###
 elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado:
     
     remaining_time = st.session_state.duration_seconds
@@ -127,8 +126,17 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
         st.info(f"**Tiempo restante: {minutes:02d}:{seconds:02d}**")
         
     st.progress((idx + 1) / total_preguntas, text=f"Pregunta {idx + 1} de {total_preguntas}")
-    st.write("---")
     
+    # ### <<< CAMBIO 2: Botón "Entregar" justo debajo del progreso >>> ###
+    st.write("---")
+    if st.button("🚨 Entregar Examen Ahora", type="primary", use_container_width=True):
+        st.session_state.examen_en_curso = False
+        st.session_state.examen_finalizado = True
+        st.rerun()
+    st.write("---")
+
+    
+    # Contenido de la pregunta
     q = st.session_state.preguntas_examen[idx]
     
     st.subheader(f"Pregunta {idx + 1}")
@@ -156,7 +164,8 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
     
     st.write("---") 
 
-    col1, col2, col3 = st.columns(3)
+    # ### <<< CAMBIO 3: Botones de navegación (Anterior/Siguiente) al final >>> ###
+    col1, col2 = st.columns(2) # Ahora son solo 2 columnas
 
     with col1:
         if st.button("⬅️ Anterior", use_container_width=True, disabled=(idx == 0)):
@@ -164,12 +173,6 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
             st.rerun()
     
     with col2:
-        if st.button("🚨 Entregar", use_container_width=True, type="primary"):
-            st.session_state.examen_en_curso = False
-            st.session_state.examen_finalizado = True
-            st.rerun()
-
-    with col3:
         if st.button("Siguiente ➡️", use_container_width=True, disabled=(idx == total_preguntas - 1)):
             st.session_state.current_question_index += 1
             st.rerun()
@@ -180,7 +183,8 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
 
 # --- VISTA DE RESULTADOS ---
 elif st.session_state.examen_finalizado:
-    st.header("🏁 Resultados del Examen")
+    # Título más pequeño también para la pantalla de resultados
+    st.markdown("<h3>🏁 Resultados del Examen</h3>", unsafe_allow_html=True)
     
     puntuacion = 0.0
     correctas = 0
