@@ -63,24 +63,26 @@ if not todas_las_preguntas:
 # --- VISTA DE INICIO ---
 if not st.session_state.examen_en_curso and not st.session_state.examen_finalizado:
     
-    # ### <<< CAMBIO 1: Título mucho más pequeño (usando font-size explícito) >>> ###
-    st.markdown("<p style='text-align: center; font-size: 22px; font-weight: bold; margin-bottom: -10px;'>📝 Examen Módulo 2</p>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; font-size: 18px; font-weight: normal;'>Auxiliar de Farmacia Hospitalaria</p>", unsafe_allow_html=True)
+    # ### <<< CAMBIO 1: Título aún más compacto y centrado >>> ###
+    st.markdown("<h2 style='text-align: center; margin-bottom: -15px;'>📝 Examen Módulo 2</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center;'>Auxiliar de Farmacia Hospitalaria</p>", unsafe_allow_html=True)
     
     online_users = get_fake_online_users()
-    st.markdown(f"<p style='text-align: center; color: #28a745;'>● {online_users} estudiantes online</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='text-align: center; color: #28a745; margin-top: -10px;'>● {online_users} estudiantes online</p>", unsafe_allow_html=True)
     st.write("---")
 
-    st.write("""
-    **Instrucciones del examen:**
-    - **Cantidad:** 30 preguntas seleccionadas al azar.
-    - **Navegación:** Podrás avanzar, retroceder y cambiar tus respuestas.
-    - **Puntuación:** +1 Correcta, -0.5 Incorrecta, 0 Omitida.
-    - **Tiempo:** Elige un límite de tiempo. Si se acaba, el examen se entregará automáticamente.
-    """)
+    # ### <<< CAMBIO 2: Instrucciones ocultas en un menú desplegable >>> ###
+    with st.expander("📖 Ver Instrucciones del Examen"):
+        st.markdown("""
+        - **Cantidad:** 30 preguntas seleccionadas al azar.
+        - **Navegación:** Podrás avanzar, retroceder y cambiar tus respuestas.
+        - **Puntuación:** +1 Correcta, -0.5 Incorrecta, 0 Omitida.
+        - **Tiempo:** Elige un límite de tiempo. Si se acaba, el examen se entregará automáticamente.
+        """)
     
+    # ### <<< CAMBIO 3: Etiqueta del radio más corta >>> ###
     time_option_minutes = st.radio(
-        "**Selecciona la duración del examen:**",
+        "**Duración:**", # Etiqueta mucho más corta
         options=[15, 30, 60, "Sin límite"],
         horizontal=True,
         format_func=lambda option: f"{option} min." if isinstance(option, int) else option
@@ -127,7 +129,6 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
         
     st.progress((idx + 1) / total_preguntas, text=f"Pregunta {idx + 1} de {total_preguntas}")
     
-    # ### <<< CAMBIO 2: Botón "Entregar" justo debajo del progreso >>> ###
     st.write("---")
     if st.button("🚨 Entregar Examen Ahora", type="primary", use_container_width=True):
         st.session_state.examen_en_curso = False
@@ -135,8 +136,6 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
         st.rerun()
     st.write("---")
 
-    
-    # Contenido de la pregunta
     q = st.session_state.preguntas_examen[idx]
     
     st.subheader(f"Pregunta {idx + 1}")
@@ -164,8 +163,7 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
     
     st.write("---") 
 
-    # ### <<< CAMBIO 3: Botones de navegación (Anterior/Siguiente) al final >>> ###
-    col1, col2 = st.columns(2) # Ahora son solo 2 columnas
+    col1, col2 = st.columns(2)
 
     with col1:
         if st.button("⬅️ Anterior", use_container_width=True, disabled=(idx == 0)):
@@ -183,7 +181,6 @@ elif st.session_state.examen_en_curso and not st.session_state.examen_finalizado
 
 # --- VISTA DE RESULTADOS ---
 elif st.session_state.examen_finalizado:
-    # Título más pequeño también para la pantalla de resultados
     st.markdown("<h3>🏁 Resultados del Examen</h3>", unsafe_allow_html=True)
     
     puntuacion = 0.0
